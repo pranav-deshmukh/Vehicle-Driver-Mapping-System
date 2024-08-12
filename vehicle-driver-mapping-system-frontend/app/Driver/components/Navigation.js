@@ -1,7 +1,7 @@
 "use client";
 
 import { BiSolidCar } from "react-icons/bi";
-import { IoSearch } from "react-icons/io5";
+import { MdOutlineAssignment } from "react-icons/md";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { CgProfile } from "react-icons/cg";
 import { RiMessage2Line } from "react-icons/ri";
@@ -19,14 +19,10 @@ export default function Navbar() {
         <section className="flex flex-col justify-center gap-4 w-[95%] h-[230px] pl-4 bg-[#a8c2f3] rounded-xl">
           <span
             className="flex items-center gap-1 text-md font-bold cursor-pointer"
-            onClick={() => handleNavigation("/createDriver")}
+            onClick={() => handleNavigation("/Driver/selectAssignment")}
           >
-            <BiSolidCar className="text-2xl" />
-            Create Driver
-          </span>
-          <span className="flex items-center gap-1 text-md font-bold cursor-pointer">
-            <IoSearch className="text-2xl" />
-            Search
+            <MdOutlineAssignment className="text-2xl" />
+            Select Assignments
           </span>
           <span className="flex items-center gap-1 text-md font-bold cursor-pointer">
             <IoMdNotificationsOutline className="text-2xl" />
