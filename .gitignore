@@ -1,0 +1,6 @@
+vehicle-management-system-backend/node_modules/
+vehicle-driver-mapping-system-frontend/node_modules/
+
+
+vehicle-management-system-backend/.env
+vehicle-driver-mapping-system-frontend/.env
