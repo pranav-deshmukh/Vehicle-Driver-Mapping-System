@@ -39,8 +39,24 @@ const driverSchema = new mongoose.Schema(
     vehicle: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Vehicle",
-      required: false,
     },
+    schedule: [
+      {
+        vehicle: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Vehicle",
+          required: true,
+        },
+        startTime: {
+          type: Date,
+          required: true,
+        },
+        endTime: {
+          type: Date,
+          required: true,
+        },
+      },
+    ],
   },
   {
     timestamps: true,

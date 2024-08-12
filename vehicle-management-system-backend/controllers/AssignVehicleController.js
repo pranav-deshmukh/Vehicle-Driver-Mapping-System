@@ -1,9 +1,10 @@
 const Driver = require("../models/DriverModel");
 const Vehicle = require("../models/VehicleModel");
+const hasConflict = require("../controllers/CheckConflicts");
 
 exports.assignDriverToVehicle = async (req, res) => {
   try {
-    const { driverId, vehicleId } = req.body;
+    const { driverId, vehicleId, startTime, endTime } = req.body;
 
     const driver = await Driver.findOne({ driverId });
     if (!driver) {
@@ -19,31 +20,28 @@ exports.assignDriverToVehicle = async (req, res) => {
         .json({ status: "fail", message: "Vehicle not found" });
     }
 
-    if (driver.vehicle) {
+    const newStartTime = new Date(startTime);
+    const newEndTime = new Date(endTime);
+    if (hasConflict(driver.schedule, newStartTime, newEndTime)) {
       return res.status(400).json({
         status: "fail",
-        message: "Driver is already assigned to a vehicle",
+        message:
+          "Driver is already assigned to another vehicle during this time period",
       });
     }
 
-    if (vehicle.driver) {
-      return res.status(400).json({
-        status: "fail",
-        message: "Vehicle is already assigned to a driver",
-      });
-    }
-
-    driver.vehicle = vehicle._id;
-    vehicle.driver = driver._id;
+    driver.schedule.push({
+      vehicle: vehicle._id,
+      startTime: newStartTime,
+      endTime: newEndTime,
+    });
 
     await driver.save();
-    await vehicle.save();
 
     res.status(200).json({
       status: "success",
       data: {
         driver,
-        vehicle,
       },
     });
   } catch (err) {
