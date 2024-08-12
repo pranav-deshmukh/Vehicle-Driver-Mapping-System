@@ -2,7 +2,8 @@
 
 import { BiSolidCar } from "react-icons/bi";
 import { MdOutlineAssignment } from "react-icons/md";
-import { IoMdNotificationsOutline } from "react-icons/io";
+import { MdAssignmentLate } from "react-icons/md";
+
 import { CgProfile } from "react-icons/cg";
 import { RiMessage2Line } from "react-icons/ri";
 import { useRouter } from "next/navigation";
@@ -19,21 +20,24 @@ export default function Navbar() {
         <section className="flex flex-col justify-center gap-4 w-[95%] h-[230px] pl-4 bg-[#a8c2f3] rounded-xl">
           <span
             className="flex items-center gap-1 text-md font-bold cursor-pointer"
-            onClick={() => handleNavigation("/createDriver")}
+            onClick={() => handleNavigation("/manager/createDriver")}
           >
             <BiSolidCar className="text-2xl" />
             Create Driver
           </span>
           <span
             className="flex items-center gap-1 text-md font-bold cursor-pointer"
-            onClick={() => handleNavigation("/assignDriver")}
+            onClick={() => handleNavigation("/manager/AssignDriver")}
           >
             <MdOutlineAssignment className="text-2xl" />
             Assign Driver
           </span>
-          <span className="flex items-center gap-1 text-md font-bold cursor-pointer">
-            <IoMdNotificationsOutline className="text-2xl" />
-            Notifications
+          <span
+            className="flex items-center gap-1 text-md font-bold cursor-pointer"
+            onClick={() => handleNavigation("/manager/unAssignDriver")}
+          >
+            <MdAssignmentLate className="text-2xl" />
+            Un Assign Driver
           </span>
           <span className="flex items-center gap-1 text-md font-bold cursor-pointer">
             <CgProfile className="text-2xl" />

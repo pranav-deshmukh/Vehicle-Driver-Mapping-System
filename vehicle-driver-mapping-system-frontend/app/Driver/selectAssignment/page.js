@@ -5,20 +5,20 @@ import { useState } from "react";
 import axios from "axios";
 
 export default function SelectAssignment() {
-  const [driverId, setDriverId] = useState(""); // State to store the driverId input
+  const [driverId, setDriverId] = useState("");
   const [pendingRequests, setPendingRequests] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent default form submission
-    setLoading(true); // Set loading state to true
+    e.preventDefault();
+    setLoading(true);
 
     try {
       const response = await axios.post(
         "http://localhost:3000/api/v1/manager/getPendingRequests",
         {
-          driverId: driverId, // Send the driverId input from the form
+          driverId: driverId,
         }
       );
       setPendingRequests(response.data.data.pendingRequests);
@@ -29,12 +29,34 @@ export default function SelectAssignment() {
     }
   };
 
+  const handleResponse = async (requestId, vehicleId, response) => {
+    try {
+      // Send a POST request to respond to the assignment
+      await axios.post(
+        `http://localhost:3000/api/v1/manager/respondToRequest`,
+        {
+          vehicleId: vehicleId,
+          response: response,
+          driverId: driverId,
+        }
+      );
+
+      // Update the UI to remove the responded request
+      setPendingRequests((prevRequests) =>
+        prevRequests.filter((request) => request._id !== requestId)
+      );
+    } catch (err) {
+      console.error(`Error ${response} request:`, err);
+    }
+  };
+
   return (
     <div className="flex">
       <Navbar />
-      <div className="w-[80%] p-4 pl-8">
+      <div className="w-[80%] p-4">
         <h1 className="text-2xl font-semibold mb-4">Pending Requests</h1>
 
+        {/* Form to input driverId */}
         <form onSubmit={handleSubmit} className="mb-6">
           <div className="mb-4">
             <label
@@ -48,7 +70,7 @@ export default function SelectAssignment() {
               id="driverId"
               value={driverId}
               onChange={(e) => setDriverId(e.target.value)}
-              className="mt-1 p-2 block w-[400px] border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               placeholder="Enter Driver ID"
               required
             />
@@ -68,21 +90,41 @@ export default function SelectAssignment() {
           <p>No pending requests found.</p>
         )}
         {!loading && !error && pendingRequests.length > 0 && (
-          <ul className="space-y-4">
+          <ul className="space-y-4 w-[600px]">
             {pendingRequests.map((request) => (
               <li
                 key={request._id}
-                className="p-4 w-[600px] bg-gray-100 rounded-lg shadow-md"
+                className="p-4 bg-gray-100 rounded-lg shadow-md flex justify-between items-center"
               >
-                <p>
-                  <strong>Vehicle ID:</strong> {request.vehicleId}
-                </p>
-                <p>
-                  <strong>Status:</strong> {request.status}
-                </p>
-                <p>
-                  <strong>Request ID:</strong> {request._id}
-                </p>
+                <div>
+                  <p>
+                    <strong>Vehicle ID:</strong> {request.vehicleId}
+                  </p>
+                  <p>
+                    <strong>Status:</strong> {request.status}
+                  </p>
+                  <p>
+                    <strong>Request ID:</strong> {request._id}
+                  </p>
+                </div>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() =>
+                      handleResponse(request._id, request.vehicleId, "accepted")
+                    }
+                    className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                  >
+                    Accept
+                  </button>
+                  <button
+                    onClick={() =>
+                      handleResponse(request._id, request.vehicleId, "rejected")
+                    }
+                    className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                  >
+                    Reject
+                  </button>
+                </div>
               </li>
             ))}
           </ul>

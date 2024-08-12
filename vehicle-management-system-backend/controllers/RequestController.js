@@ -82,7 +82,7 @@ exports.respondToRequest = async (req, res, next) => {
       const requestIndex = driver.assignmentRequests.findIndex(
         (req) => req.vehicleId.toString() === vehicleId
       );
-      driver.assignmentRequests[requestIndex].status = "rejected";
+      driver.assignmentRequests[0].status = "rejected";
     }
 
     await driver.save();

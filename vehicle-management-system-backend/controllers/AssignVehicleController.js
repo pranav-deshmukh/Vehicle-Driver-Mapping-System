@@ -57,21 +57,28 @@ exports.unassignDriverFromVehicle = async (req, res) => {
     const { driverId } = req.body;
 
     const driver = await Driver.findOne({ driverId });
-    if (!driver || !driver.vehicle) {
+    console.log(driver);
+    if (
+      !driver ||
+      !driver.assignmentRequests[0].status === "pending" ||
+      !driver.assignmentRequests[0].status === "rejected"
+    ) {
       return res.status(404).json({
         status: "fail",
         message: "Driver is not assigned to any vehicle",
       });
     }
 
-    const vehicle = await Vehicle.findById(driver.vehicle);
+    const vehicle = await Vehicle.findOne({
+      vehicleId: driver.assignmentRequests[0].vehicleId,
+    });
     if (!vehicle) {
       return res
         .status(404)
         .json({ status: "fail", message: "Vehicle not found" });
     }
 
-    driver.vehicle = null;
+    driver.assignmentRequests[0] = null;
     vehicle.driver = null;
 
     await driver.save();
