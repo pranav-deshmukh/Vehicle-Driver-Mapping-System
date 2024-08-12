@@ -31,17 +31,15 @@ const driverSchema = new mongoose.Schema(
     },
     location: {
       type: String,
-      required: false,
     },
     workHours: {
-      start: {
-        type: String,
-        required: false,
-      },
-      end: {
-        type: String,
-        required: false,
-      },
+      start: String,
+      end: String,
+    },
+    vehicle: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Vehicle",
+      required: false,
     },
   },
   {
