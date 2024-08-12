@@ -1,6 +1,21 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 
+const assignmentRequestSchema = new mongoose.Schema({
+  vehicleId: {
+    type: String,
+    required: true,
+  },
+  status: {
+    type: String,
+    enum: ["pending", "accepted", "rejected"],
+    default: "pending",
+  },
+  assignedAt: {
+    type: Date,
+  },
+});
+
 const driverSchema = new mongoose.Schema(
   {
     driverId: {
@@ -43,8 +58,7 @@ const driverSchema = new mongoose.Schema(
     schedule: [
       {
         vehicle: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Vehicle",
+          type: String,
           required: true,
         },
         startTime: {
@@ -57,6 +71,7 @@ const driverSchema = new mongoose.Schema(
         },
       },
     ],
+    assignmentRequests: [assignmentRequestSchema],
   },
   {
     timestamps: true,
