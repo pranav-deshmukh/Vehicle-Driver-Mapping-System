@@ -12,6 +12,6 @@ router.post(
 );
 router.post("/sendAssignmentRequest", requestController.sendAssignmentRequest);
 router.post("/respondToRequest", requestController.respondToRequest);
-router.get("/getPendingRequests", requestController.getPendingRequests);
+router.post("/getPendingRequests", requestController.getPendingRequests);
 
 module.exports = router;
