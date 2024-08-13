@@ -3,8 +3,10 @@
 import Navbar from "../components/Navigation";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import MapComponent from "../components/MapComponent"; // Import MapComponent
 
 export default function SendAssignmentRequest() {
+  // Existing states
   const [vehicleId, setVehicleId] = useState("");
   const [driverIdInput, setDriverIdInput] = useState("");
   const [driverIds, setDriverIds] = useState([]);
@@ -14,14 +16,13 @@ export default function SendAssignmentRequest() {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
-  // State for storing all drivers and search results
+  // States for drivers and search
   const [drivers, setDrivers] = useState([]);
   const [searchName, setSearchName] = useState("");
   const [searchPhone, setSearchPhone] = useState("");
   const [filteredDrivers, setFilteredDrivers] = useState([]);
 
   useEffect(() => {
-    // Fetch all drivers when component mounts
     const fetchDrivers = async () => {
       try {
         const response = await axios.get(
@@ -38,7 +39,6 @@ export default function SendAssignmentRequest() {
   }, []);
 
   useEffect(() => {
-    // Filter drivers based on search criteria
     const filterDrivers = () => {
       const nameLower = searchName.toLowerCase();
       const phoneLower = searchPhone.toLowerCase();
@@ -140,27 +140,31 @@ export default function SendAssignmentRequest() {
                 placeholder="Enter driver phone number"
               />
             </div>
+            <div className="mb-6">
+              <h2 className="text-xl font-semibold mb-4">Available Drivers</h2>
+              {filteredDrivers.length === 0 ? (
+                <p>No drivers found.</p>
+              ) : (
+                <ul className="h-[60px] overflow-y-auto w-[400px]">
+                  {filteredDrivers.map((driver) => (
+                    <li key={driver.driverId} className="mb-2">
+                      <span className="font-semibold">{driver.driverName}</span>{" "}
+                      - {driver.phone} - {driver.driverId}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </div>
 
-          <div className="mb-6">
-            <h2 className="text-xl font-semibold mb-4">Available Drivers</h2>
-            {filteredDrivers.length === 0 ? (
-              <p>No drivers found.</p>
-            ) : (
-              <ul className="h-[60px] overflow-y-auto w-[400px]">
-                {filteredDrivers.map((driver) => (
-                  <li key={driver.driverId} className="mb-2">
-                    <span className="font-semibold">{driver.driverName}</span> -{" "}
-                    {driver.phone} - {driver.driverId}
-                  </li>
-                ))}
-              </ul>
-            )}
+          <div className="mb-6 w-[600px] h-[350px]">
+            <h2 className="text-xl font-semibold mb-4">Drivers on Map</h2>
+            <MapComponent drivers={filteredDrivers} />
           </div>
         </div>
         <form
           onSubmit={handleSubmit}
-          className="mb-6 w-[400px] ml-10 mt-4 h-[360px] overflow-y-auto"
+          className="mb-6 w-[400px] ml-10 mt-4 h-[200px] overflow-y-auto"
         >
           <div className="mb-4">
             <label

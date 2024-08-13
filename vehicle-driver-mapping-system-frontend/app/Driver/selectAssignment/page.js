@@ -32,6 +32,7 @@ export default function SelectAssignment() {
   const handleResponse = async (requestId, vehicleId, response) => {
     try {
       // Send a POST request to respond to the assignment
+      console.log(response);
       await axios.post(
         `http://localhost:3000/api/v1/manager/respondToRequest`,
         {

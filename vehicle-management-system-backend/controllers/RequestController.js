@@ -125,32 +125,47 @@ exports.respondToRequest = async (req, res, next) => {
     const { vehicleId, response, driverId } = req.body;
 
     const driver = await Driver.findOne({ driverId });
+    if (!driver) {
+      return res
+        .status(404)
+        .json({ status: "fail", message: "Driver not found" });
+    }
+
     console.log(response);
 
+    // Find the index of the request with the given vehicleId
+    const requestIndex = driver.assignmentRequests.findIndex(
+      (req) => req.vehicleId.toString() === vehicleId
+    );
+
+    if (requestIndex === -1) {
+      return res
+        .status(404)
+        .json({ status: "fail", message: "Request not found" });
+    }
+
     if (response === "accepted") {
+      // Reject all other requests for the same vehicle
       await Driver.updateMany(
         { "assignmentRequests.vehicleId": vehicleId },
         { $set: { "assignmentRequests.$.status": "rejected" } }
       );
 
-      const requestIndex = driver.assignmentRequests.findIndex(
-        (req) => req.vehicleId.toString() === vehicleId
-      );
-      driver.assignmentRequests[0].status = "accepted";
-      driver.assignmentRequests[0].assignedAt = new Date();
+      // Update the status of the specific request to "accepted"
+      driver.assignmentRequests[requestIndex].status = "accepted";
+      driver.assignmentRequests[requestIndex].assignedAt = new Date();
 
+      // Add to schedule
       driver.schedule.push({
         vehicle: vehicleId,
         startTime: new Date(),
         endTime: new Date(),
       });
     } else if (response === "rejected") {
-      const requestIndex = driver.assignmentRequests.findIndex(
-        (req) => req.vehicleId.toString() === vehicleId
-      );
-      driver.assignmentRequests[0].status = "rejected";
+      // Update the status of the specific request to "rejected"
+      driver.assignmentRequests[requestIndex].status = "rejected";
     }
-
+    console.log(driver);
     await driver.save();
 
     res.status(200).json({

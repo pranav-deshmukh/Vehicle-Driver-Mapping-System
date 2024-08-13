@@ -73,7 +73,7 @@ const driverSchema = new mongoose.Schema(
     schedule: [
       {
         vehicle: {
-          type: mongoose.Schema.Types.ObjectId,
+          type: String,
           ref: "Vehicle",
           required: true,
         },
