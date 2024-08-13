@@ -4,6 +4,7 @@ import axios from "axios";
 import Navigation from "./../components/Navigation";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import L from "leaflet";
 
 export default function DriverForm() {
   const [formData, setFormData] = useState({
@@ -152,6 +153,12 @@ export default function DriverForm() {
               />
               <Marker
                 position={[formData.location.lat, formData.location.lng]}
+                icon={L.icon({
+                  iconUrl: "/locationPointer.png",
+                  iconSize: [25, 41],
+                  iconAnchor: [12, 41],
+                  popupAnchor: [1, -34],
+                })}
               />
               <LocationMarker onClick={handleMapClick} />
             </MapContainer>
