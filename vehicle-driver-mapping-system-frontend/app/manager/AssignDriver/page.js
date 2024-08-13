@@ -3,10 +3,10 @@
 import Navbar from "../components/Navigation";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import MapComponent from "../components/MapComponent"; // Import MapComponent
+import MapComponent from "../components/MapComponent";
+import { Toaster, toast } from "sonner";
 
 export default function SendAssignmentRequest() {
-  // Existing states
   const [vehicleId, setVehicleId] = useState("");
   const [driverIdInput, setDriverIdInput] = useState("");
   const [driverIds, setDriverIds] = useState([]);
@@ -15,8 +15,8 @@ export default function SendAssignmentRequest() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  const [response, setResponse] = useState("");
 
-  // States for drivers and search
   const [drivers, setDrivers] = useState([]);
   const [searchName, setSearchName] = useState("");
   const [searchPhone, setSearchPhone] = useState("");
@@ -83,6 +83,7 @@ export default function SendAssignmentRequest() {
           endTime: endTime,
         }
       );
+      setResponse(response.data.message);
 
       if (response.status === 200) {
         setSuccess(true);
@@ -91,10 +92,14 @@ export default function SendAssignmentRequest() {
         setStartTime("");
         setEndTime("");
       }
+      toast.success("Assignment request sent");
 
       setLoading(false);
     } catch (err) {
       setError(err.message);
+      console.log(err.response.data.message);
+      console.log(response);
+      toast.error(err.response.data.message);
       setLoading(false);
       console.log(err);
     }
@@ -102,6 +107,7 @@ export default function SendAssignmentRequest() {
 
   return (
     <div className="flex h-screen ">
+      <Toaster richColors position="top-center" />
       <Navbar />
       <div className="w-[80%] p-4 bg-slate-100">
         <h1 className="text-2xl font-semibold mb-4">Send Assignment Request</h1>

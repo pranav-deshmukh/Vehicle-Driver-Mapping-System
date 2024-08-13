@@ -13,7 +13,7 @@ export default function Navbar() {
     router.push(path);
   };
   return (
-    <div className="w-[300px] h-screen flex flex-col justify-between pt-4 text-[#515050] border-r-[1.8px] border-[#a8c2f3] pl-5">
+    <div className="w-[300px] h-screen flex flex-col justify-between pt-4 text-[#515050] border-r-[1.8px] bg-[#90aee4] border-[#a8c2f3] pl-5">
       <div className="flex flex-col gap-1">
         <section className="text-2xl mb-5">Logo</section>
         <section className="flex flex-col justify-center gap-4 w-[95%] h-[230px] pl-4 bg-[#a8c2f3] rounded-xl">

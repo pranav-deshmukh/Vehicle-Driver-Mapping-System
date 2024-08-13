@@ -7,6 +7,7 @@ import { ImProfile } from "react-icons/im";
 import { CgProfile } from "react-icons/cg";
 import { RiMessage2Line } from "react-icons/ri";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function Navbar() {
   const router = useRouter();
@@ -16,7 +17,9 @@ export default function Navbar() {
   return (
     <div className="w-[300px] h-screen flex flex-col justify-between pt-4 text-[#515050] border-r-[1.8px] bg-[#90aee4] border-[#a8c2f3] pl-5">
       <div className="flex flex-col gap-1">
-        <section className="text-2xl mb-5">Logo</section>
+        <section className="text-2xl mb-5">
+          <Image src={"/next.svg"} width={100} height={100} alt="LOGO" />
+        </section>
         <section className="flex flex-col justify-center gap-4 w-[95%] h-[230px] pl-4 bg-[#a8c2f3] rounded-xl">
           <span
             className="flex items-center gap-1 text-md font-bold cursor-pointer"

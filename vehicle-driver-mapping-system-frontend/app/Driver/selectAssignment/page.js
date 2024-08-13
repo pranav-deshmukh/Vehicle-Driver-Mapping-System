@@ -3,6 +3,7 @@
 import Navbar from "../components/Navigation";
 import { useState } from "react";
 import axios from "axios";
+import { Toaster, toast } from "sonner";
 
 export default function SelectAssignment() {
   const [driverId, setDriverId] = useState("");
@@ -31,7 +32,6 @@ export default function SelectAssignment() {
 
   const handleResponse = async (requestId, vehicleId, response) => {
     try {
-      // Send a POST request to respond to the assignment
       console.log(response);
       await axios.post(
         `http://localhost:3000/api/v1/manager/respondToRequest`,
@@ -42,10 +42,10 @@ export default function SelectAssignment() {
         }
       );
 
-      // Update the UI to remove the responded request
       setPendingRequests((prevRequests) =>
         prevRequests.filter((request) => request._id !== requestId)
       );
+      toast.success("Reponse sent");
     } catch (err) {
       console.error(`Error ${response} request:`, err);
     }
@@ -57,7 +57,6 @@ export default function SelectAssignment() {
       <div className="w-[80%] p-4">
         <h1 className="text-2xl font-semibold mb-4">Pending Requests</h1>
 
-        {/* Form to input driverId */}
         <form onSubmit={handleSubmit} className="mb-6">
           <div className="mb-4">
             <label

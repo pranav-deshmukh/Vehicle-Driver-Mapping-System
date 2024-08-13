@@ -5,6 +5,7 @@ import Navigation from "./../components/Navigation";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import { Toaster, toast } from "sonner";
 
 export default function DriverForm() {
   const [formData, setFormData] = useState({
@@ -36,23 +37,26 @@ export default function DriverForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setResponseMessage(null); // Clear previous response message
+    setResponseMessage(null);
 
     try {
       const response = await axios.post(
         "http://localhost:3000/api/v1/manager/createDriver",
         formData
       );
-      setResponseMessage(response.data.message); // Store the success message from the API
+      setResponseMessage(response.data.message);
+      toast.success("Driver created successfully");
     } catch (error) {
       setResponseMessage(
         error.response?.data?.message || "An error occurred. Please try again."
-      ); // Store the error message from the API
+      );
+      toast.error(responseMessage);
     }
   };
 
   return (
-    <div className="flex">
+    <div className="flex ">
+      <Toaster position="top-center" richColors />
       <Navigation />
       <div className="max-w-4xl mx-auto p-2 bg-white rounded-lg shadow-md w-[80%] h-screen overflow-y-auto">
         <h1 className="text-3xl font-semibold mb-6 text-gray-800">

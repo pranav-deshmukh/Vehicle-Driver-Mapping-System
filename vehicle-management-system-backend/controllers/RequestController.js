@@ -27,28 +27,14 @@ exports.assignOrRequestDriverToVehicle = async (req, res) => {
 
     // Check for schedule conflicts
     if (hasConflict(driver.schedule, newStartTime, newEndTime)) {
-      // If a conflict exists, create an assignment request instead
-      await Driver.updateOne(
-        { driverId },
-        {
-          $push: {
-            assignmentRequests: {
-              vehicleId,
-              startTime: newStartTime,
-              endTime: newEndTime,
-            },
-          },
-        }
-      );
-
       return res.status(400).json({
         status: "fail",
         message:
-          "Driver is already assigned to another vehicle during this time period. Assignment request has been created.",
+          "Driver is already assigned to another vehicle during this time period.",
       });
     }
 
-    // Assign the driver to the vehicle if no conflict exists
+    // If no conflict exists, add the assignment to assignmentRequests
     await Driver.updateOne(
       { driverId },
       {
@@ -61,16 +47,12 @@ exports.assignOrRequestDriverToVehicle = async (req, res) => {
         },
       }
     );
-    // driver.schedule.push({
-    //   vehicle: vehicle._id,
-    //   startTime: newStartTime,
-    //   endTime: newEndTime,
-    // });
 
     await driver.save();
 
     res.status(200).json({
       status: "success",
+      message: "Assignment request has been successfully created.",
       data: {
         driver,
       },
