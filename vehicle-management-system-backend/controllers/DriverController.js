@@ -13,6 +13,7 @@ exports.createDriver = async (req, res) => {
 
     res.status(201).json({
       status: "success",
+      message: "driver created successfully",
       data: {
         driver: newDriver,
       },
@@ -21,6 +22,25 @@ exports.createDriver = async (req, res) => {
     res.status(400).json({
       status: "fail",
       message: err.message,
+    });
+  }
+};
+
+exports.getDrivers = async (req, res) => {
+  try {
+    const drivers = await Driver.find({});
+
+    res.status(200).json({
+      status: "success",
+      results: drivers.length,
+      data: {
+        drivers,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "fail",
+      message: error.message,
     });
   }
 };

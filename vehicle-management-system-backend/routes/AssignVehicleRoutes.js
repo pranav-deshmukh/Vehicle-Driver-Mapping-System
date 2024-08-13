@@ -10,7 +10,10 @@ router.post(
   "/assign-with-schedule",
   vehicleDriverController.assignDriverToVehicle
 );
-router.post("/sendAssignmentRequest", requestController.sendAssignmentRequest);
+router.post(
+  "/sendAssignmentRequest",
+  requestController.assignOrRequestDriverToVehicle
+);
 router.post("/respondToRequest", requestController.respondToRequest);
 router.post("/getPendingRequests", requestController.getPendingRequests);
 

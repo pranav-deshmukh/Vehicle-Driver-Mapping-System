@@ -1,27 +1,93 @@
 const Driver = require("../models/DriverModel");
+const Vehicle = require("../models/VehicleModel");
 
-exports.sendAssignmentRequest = async (req, res, next) => {
+exports.assignOrRequestDriverToVehicle = async (req, res) => {
   try {
-    const { vehicleId, driverIds } = req.body;
+    const { driverId, vehicleId, startTime, endTime } = req.body;
 
-    for (const driverId of driverIds) {
+    // Find the driver by driverId
+    const driver = await Driver.findOne({ driverId });
+    if (!driver) {
+      return res
+        .status(404)
+        .json({ status: "fail", message: "Driver not found" });
+    }
+
+    // Find the vehicle by vehicleId
+    const vehicle = await Vehicle.findOne({ vehicleId });
+    if (!vehicle) {
+      return res
+        .status(404)
+        .json({ status: "fail", message: "Vehicle not found" });
+    }
+
+    // Convert the provided times to Date objects
+    const newStartTime = new Date(startTime);
+    const newEndTime = new Date(endTime);
+
+    // Check for schedule conflicts
+    if (hasConflict(driver.schedule, newStartTime, newEndTime)) {
+      // If a conflict exists, create an assignment request instead
       await Driver.updateOne(
         { driverId },
         {
           $push: {
-            assignmentRequests: { vehicleId },
+            assignmentRequests: {
+              vehicleId,
+              startTime: newStartTime,
+              endTime: newEndTime,
+            },
           },
         }
       );
+
+      return res.status(400).json({
+        status: "fail",
+        message:
+          "Driver is already assigned to another vehicle during this time period. Assignment request has been created.",
+      });
     }
+
+    // Assign the driver to the vehicle if no conflict exists
+    await Driver.updateOne(
+      { driverId },
+      {
+        $push: {
+          assignmentRequests: {
+            vehicleId,
+            startTime: newStartTime,
+            endTime: newEndTime,
+          },
+        },
+      }
+    );
+    // driver.schedule.push({
+    //   vehicle: vehicle._id,
+    //   startTime: newStartTime,
+    //   endTime: newEndTime,
+    // });
+
+    await driver.save();
 
     res.status(200).json({
       status: "success",
-      message: "Assignment requests sent successfully",
+      data: {
+        driver,
+      },
     });
   } catch (err) {
-    res.status(400).json({ status: "fail", message: err.message });
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
   }
+};
+
+// Function to check for schedule conflicts
+const hasConflict = (schedule, newStartTime, newEndTime) => {
+  return schedule.some(
+    (slot) => newStartTime < slot.endTime && newEndTime > slot.startTime
+  );
 };
 
 exports.getPendingRequests = async (req, res, next) => {

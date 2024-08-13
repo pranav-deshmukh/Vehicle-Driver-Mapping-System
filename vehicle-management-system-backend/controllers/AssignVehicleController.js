@@ -78,7 +78,7 @@ exports.unassignDriverFromVehicle = async (req, res) => {
         .json({ status: "fail", message: "Vehicle not found" });
     }
 
-    driver.assignmentRequests[0] = null;
+    driver.assignmentRequests.shift();
     vehicle.driver = null;
 
     await driver.save();

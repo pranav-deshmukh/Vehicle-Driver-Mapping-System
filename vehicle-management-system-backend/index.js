@@ -19,30 +19,24 @@ mongoose
       try {
         const now = new Date();
 
-        // Find all drivers with assignments that have ended
         const drivers = await Driver.find({
           "schedule.endTime": { $lte: now },
         });
 
         for (const driver of drivers) {
-          // Log the driver's current schedule before update
           console.log(`Driver before update: ${JSON.stringify(driver)}`);
 
-          // Remove expired assignments
           driver.schedule = driver.schedule.filter(
             (assignment) => assignment.endTime > now
           );
 
-          // If there are no future assignments, unassign the vehicle and clear the schedule
           if (driver.schedule.length === 0) {
             driver.vehicle = null;
-            driver.schedule = []; // Clear the schedule
+            driver.schedule = [];
           }
 
-          // Save the updated driver data
           await driver.save();
 
-          // Log the driver's new schedule after update
           console.log(`Driver after update: ${JSON.stringify(driver)}`);
         }
 

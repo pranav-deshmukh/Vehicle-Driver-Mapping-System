@@ -2,6 +2,8 @@
 import { useState } from "react";
 import axios from "axios";
 import Navigation from "./../components/Navigation";
+import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
 
 export default function DriverForm() {
   const [formData, setFormData] = useState({
@@ -9,9 +11,19 @@ export default function DriverForm() {
     driverName: "",
     driverEmail: "",
     phone: "",
-    location: "",
+    location: { lat: 51.505, lng: -0.09 },
     vehicle: "",
   });
+
+  const [responseMessage, setResponseMessage] = useState(null);
+
+  const handleMapClick = (e) => {
+    const { lat, lng } = e.latlng;
+    setFormData((prevData) => ({
+      ...prevData,
+      location: { lat, lng },
+    }));
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -21,38 +33,27 @@ export default function DriverForm() {
     }));
   };
 
-  const handleWorkHoursChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      workHours: {
-        ...prevData.workHours,
-        [name]: value,
-      },
-    }));
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setResponseMessage(null); // Clear previous response message
 
     try {
       const response = await axios.post(
         "http://localhost:3000/api/v1/manager/createDriver",
         formData
       );
-      console.log("Response from server:", response.data);
-      // Optionally, you can reset the form or provide feedback to the user
-      // setFormData({ ...initialFormData });
+      setResponseMessage(response.data.message); // Store the success message from the API
     } catch (error) {
-      console.error("Error submitting form:", error);
-      // Optionally, handle errors and provide feedback to the user
+      setResponseMessage(
+        error.response?.data?.message || "An error occurred. Please try again."
+      ); // Store the error message from the API
     }
   };
 
   return (
     <div className="flex">
       <Navigation />
-      <div className="max-w-4xl mx-auto p-8 bg-white rounded-lg shadow-md mt-6 w-[80%]">
+      <div className="max-w-4xl mx-auto p-2 bg-white rounded-lg shadow-md w-[80%] h-screen overflow-y-auto">
         <h1 className="text-3xl font-semibold mb-6 text-gray-800">
           Driver Information Form
         </h1>
@@ -127,22 +128,33 @@ export default function DriverForm() {
               />
             </div>
             <div>
-              <label
-                htmlFor="location"
-                className="block text-sm font-medium text-gray-600 mb-1"
-              >
+              <label className="block text-sm font-medium text-gray-600 mb-1">
                 Location
               </label>
-              <input
-                type="text"
-                id="location"
-                name="location"
-                value={formData.location}
-                onChange={handleChange}
-                className="block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                required
-              />
+              <div className="border p-2 rounded-lg text-gray-700 bg-gray-100">
+                {`Latitude: ${formData.location.lat}, Longitude: ${formData.location.lng}`}
+              </div>
             </div>
+          </div>
+
+          <div className="">
+            <label className="block text-sm font-medium text-gray-600 mb-1">
+              Map
+            </label>
+            <MapContainer
+              center={[formData.location.lat, formData.location.lng]}
+              zoom={13}
+              style={{ height: "300px", width: "100%" }}
+            >
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              />
+              <Marker
+                position={[formData.location.lat, formData.location.lng]}
+              />
+              <LocationMarker onClick={handleMapClick} />
+            </MapContainer>
           </div>
 
           <button
@@ -152,7 +164,25 @@ export default function DriverForm() {
             Submit
           </button>
         </form>
+
+        {/* Display the response message */}
+        {responseMessage && (
+          <div className="mt-4 p-4 border rounded-lg bg-gray-100">
+            <p className="text-sm text-gray-700">{responseMessage}</p>
+          </div>
+        )}
       </div>
     </div>
   );
+}
+
+function LocationMarker({ onClick }) {
+  const map = useMapEvents({
+    click(e) {
+      onClick(e);
+      map.flyTo(e.latlng, map.getZoom());
+    },
+  });
+
+  return null;
 }

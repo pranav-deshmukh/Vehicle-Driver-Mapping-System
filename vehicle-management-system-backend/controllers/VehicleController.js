@@ -21,3 +21,21 @@ exports.createVehicle = async (req, res) => {
     });
   }
 };
+
+exports.getVehicles = async (req, res) => {
+  try {
+    const vehicles = await Vehicle.find({});
+    res.status(200).json({
+      status: "success",
+      results: vehicles.length,
+      data: {
+        vehicles,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "fail",
+      message: error.message,
+    });
+  }
+};

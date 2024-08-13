@@ -45,12 +45,27 @@ const driverSchema = new mongoose.Schema(
       },
     },
     location: {
-      type: String,
+      type: {
+        lat: {
+          type: Number,
+          required: true,
+        },
+        lng: {
+          type: Number,
+          required: true,
+        },
+      },
     },
-    workHours: {
-      start: String,
-      end: String,
-    },
+    // workHours: {
+    //   start: {
+    //     type: String,
+    //     required: [true, "Please provide the driver's start work hour"],
+    //   },
+    //   end: {
+    //     type: String,
+    //     required: [true, "Please provide the driver's end work hour"],
+    //   },
+    // },
     vehicle: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Vehicle",
@@ -58,7 +73,8 @@ const driverSchema = new mongoose.Schema(
     schedule: [
       {
         vehicle: {
-          type: String,
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Vehicle",
           required: true,
         },
         startTime: {
@@ -77,5 +93,18 @@ const driverSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+driverSchema.methods.hasSchedulingConflict = function (
+  newStartTime,
+  newEndTime
+) {
+  return this.schedule.some((slot) => {
+    return (
+      (newStartTime >= slot.startTime && newStartTime < slot.endTime) ||
+      (newEndTime > slot.startTime && newEndTime <= slot.endTime) ||
+      (newStartTime <= slot.startTime && newEndTime >= slot.endTime)
+    );
+  });
+};
 
 module.exports = mongoose.model("Driver", driverSchema);
